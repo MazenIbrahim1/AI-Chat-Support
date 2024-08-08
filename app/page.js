@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Box, Button, Stack, TextField } from "@mui/material"
 
 export default function Home() {
@@ -10,39 +10,75 @@ export default function Home() {
 
   // Textfield message
   const [message, setMessage] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const sendMessage = async () => {
-    setMessage('')
-    setMessages((messages) => [...messages, {role: 'user', content: message}, {role: 'assistant', content: ''}])
-    const response = fetch('api/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify([...messages, {role: 'user', content: message}])
-    }).then(async (res) => {
-      const reader = res.body.getReader()
-      const decoder = new TextDecoder()
-      let result = ''
-      return reader.read().then(function processText({done, value}) {
-        if(done) {
-          return result
-        }
-        const text = decoder.decode(value || new Uint8Array(), {stream: true})
-        console.log(text)
-        setMessages((messages) => {
-          let lastMsg = messages[messages.length - 1]
-          let otherMsges = messages.slice(0, messages.length - 1)
+    // Dont send empty messages
+    if (!message.trim() || isLoading) return;
 
+    setIsLoading(true)
+    setMessage('')
+    setMessages((messages) => [
+      ...messages,
+      { role: 'user', content: message },
+      { role: 'assistant', content: '' },
+    ])
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify([...messages, { role: 'user', content: message }]),
+      })
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
+      }
+
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        const text = decoder.decode(value, { stream: true })
+        setMessages((messages) => {
+          let lastMessage = messages[messages.length - 1]
+          let otherMessages = messages.slice(0, messages.length - 1)
           return [
-            ...otherMsges,
-            {...lastMsg, content: lastMsg.content + text}
+            ...otherMessages,
+            { ...lastMessage, content: lastMessage.content + text },
           ]
         })
-        return reader.read().then(processText)
-      })
-    })
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      setMessages((messages) => [
+        ...messages,
+        { role: 'assistant', content: "I'm sorry, but I encountered an error. Please try again later." },
+      ])
+    }
+    setIsLoading(false)
   }
+
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
+      sendMessage()
+    }
+  }
+
+  const messagesEndRef = useRef(null)
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
 
   return (
     <>
@@ -56,8 +92,8 @@ export default function Home() {
       >
         <Stack 
           direction='column' 
-          width="500px" 
-          height="700px" 
+          width="90vw" 
+          height="90vh" 
           border='1px solid black' 
           p={2}
           spacing={2}
@@ -87,6 +123,7 @@ export default function Home() {
                 </Box>
               ))
             }
+            <div ref={messagesEndRef} />
           </Stack>
           <Stack direction='row' spacing={2}>
             <TextField 
@@ -94,12 +131,16 @@ export default function Home() {
               fullWidth
               value={message}
               onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={handleKeyPress}
+              disabled={isLoading}
+              autoComplete="off"
             />
             <Button 
               variant="contained"
               onClick={sendMessage}
+              disabled={isLoading}
             >
-              Send
+              {isLoading? 'Sending...' : 'Send'}
             </Button>
           </Stack>
         </Stack>
