@@ -1,7 +1,8 @@
 "use client"
 import { useState, useRef, useEffect } from "react"
 import { Box, Button, Stack, TextField } from "@mui/material"
-import SendIcon from '@mui/icons-material/Send';
+import ReactMarkdown from 'react-markdown'
+import SendIcon from '@mui/icons-material/Send'
 
 export default function Home() {
   // Messages
@@ -119,7 +120,11 @@ export default function Home() {
                     borderRadius={16}
                     p={3}
                   >
-                    {msg.content}
+                    {msg.role === 'assistant' ? 
+                      <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      :
+                      msg.content
+                    }
                   </Box>
                 </Box>
               ))
