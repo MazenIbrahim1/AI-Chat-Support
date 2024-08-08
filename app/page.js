@@ -1,6 +1,7 @@
 "use client"
 import { useState, useRef, useEffect } from "react"
 import { Box, Button, Stack, TextField } from "@mui/material"
+import SendIcon from '@mui/icons-material/Send';
 
 export default function Home() {
   // Messages
@@ -139,6 +140,7 @@ export default function Home() {
               variant="contained"
               onClick={sendMessage}
               disabled={isLoading}
+              startIcon={<SendIcon />}
             >
               {isLoading? 'Sending...' : 'Send'}
             </Button>
