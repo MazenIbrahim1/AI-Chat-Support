@@ -3,6 +3,8 @@ import { useState, useRef, useEffect } from "react"
 import { Box, Button, Stack, TextField } from "@mui/material"
 import ReactMarkdown from 'react-markdown'
 import SendIcon from '@mui/icons-material/Send'
+import { Logout } from "@mui/icons-material"
+import Header from "./components/header"
 
 export default function Home() {
   // Messages
@@ -84,6 +86,21 @@ export default function Home() {
 
   return (
     <>
+      <Header Button={
+        <Button 
+          sx={{
+            backgroundColor: '#0fa4af',
+            '&:hover': {
+              backgroundColor: '#0C7E87'
+            }
+          }}
+          variant="contained" 
+          onClick={
+          () => {
+            // FUNCTIONALITY STILL REQUIRED
+            console.log('Logging out')
+        }} startIcon={<Logout />}>Logout</Button>
+      }/>
       <Box
         width='100vw'
         height='100vh'
@@ -91,12 +108,14 @@ export default function Home() {
         flexDirection='column'
         justifyContent='center'
         alignItems='center'
+        bgcolor='#024950'
       >
         <Stack 
           direction='column' 
           width="90vw" 
-          height="90vh" 
+          height="85vh" 
           border='1px solid black' 
+          borderRadius='16px'
           p={2}
           spacing={2}
         >
@@ -115,10 +134,11 @@ export default function Home() {
                   justifyContent={msg.role === 'assistant' ? 'flex-start' : 'flex-end'}
                 >
                   <Box
-                    bgcolor={msg.role === 'assistant' ? 'primary.main' : 'secondary.main'}
+                    bgcolor={msg.role === 'assistant' ? '#003135' : '#0fa4af'}
                     color='white'
                     borderRadius={16}
                     p={3}
+                    lineHeight={2}
                   >
                     {msg.role === 'assistant' ? 
                       <ReactMarkdown>{msg.content}</ReactMarkdown>
@@ -133,6 +153,25 @@ export default function Home() {
           </Stack>
           <Stack direction='row' spacing={2}>
             <TextField 
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: '#0C7E87',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: 'black',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#0fa4af',
+                  }
+                },
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: 'black',
+                }
+              }}
+              style={{
+
+              }}
               label="Message" 
               fullWidth
               value={message}
@@ -146,6 +185,12 @@ export default function Home() {
               onClick={sendMessage}
               disabled={isLoading}
               startIcon={<SendIcon />}
+              sx={{
+                backgroundColor: '#0fa4af',
+                '&:hover': {
+                  backgroundColor: '#0C7E87'
+                }
+              }}
             >
               {isLoading? 'Sending...' : 'Send'}
             </Button>
