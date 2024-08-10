@@ -1,44 +1,56 @@
 "use client"
-import { Box, Button, Stack, TextField, Typography } from "@mui/material"
-import Header from "./components/header"
-import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { auth } from "./firebase";
+import { useState } from 'react';
+import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import { auth } from '../firebase';
+import { TextField, Button, Typography, Box } from '@mui/material';
+import { useRouter } from 'next/navigation';
+import Header from '../components/header';
+import { Login } from '@mui/icons-material';
 
-export default function Home() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+export default function Signup() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
 
-  const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth)
-
+  const [createUserWithEmailAndPassword] = useCreateUserWithEmailAndPassword(auth)
   const router = useRouter()
 
   const handleSubmit = async (event) => {
     event.preventDefault()
     try {
-      const res = await signInWithEmailAndPassword(email, password)
-      if (res?.user) {
-        sessionStorage.setItem('user', true);
-        setEmail('');
-        setPassword('');
-        router.push('/dashboard');
-      } else {
-        throw new Error('Authentication failed!');
-      }    
-    } catch (err) {
-      console.log(err)
-      setError('*Incorrect Email or Password*')
-      setTimeout(() => {
-        setError('')
-      }, 2000)
+        const res = await createUserWithEmailAndPassword(email, password)
+        if (res?.user) {
+          console.log({res})
+          sessionStorage.setItem('user', true)
+          router.push('/dashboard')
+          setEmail('')
+          setPassword('')
+        } else {
+          throw new Error('Authentication failed!');
+        }        
+    } catch(e) {
+        setError("*Something went wrong*")
+        setTimeout(() => {
+          setError('')
+        }, 2000)
     }
-  }
+  };
 
   return (
     <>
-      <Header />
+      <Header Button={<Button 
+      variant="contained" 
+      sx={{
+        backgroundColor: '#0fa4af',
+        '&:hover': {
+          backgroundColor: '#0C7E87'
+        }
+      }}
+      onClick={
+          () => {
+            router.push('/')
+        }} startIcon={<Login />}>Sign in</Button>
+      }/>
       <Box
         display="flex"
         flexDirection="column"
@@ -47,7 +59,7 @@ export default function Home() {
         width="100vw"
         minHeight="95vh"
         bgcolor='#024950'
-        gap={2}
+        gap={1.5}
       >
         <Box
           display="flex"
@@ -63,36 +75,15 @@ export default function Home() {
           padding={2}
         >
           <Typography variant="h4" component="h1" gutterBottom color='white'>
-            Sign In
+            Sign Up
           </Typography>
           <form onSubmit={handleSubmit} style={{ width: '100%' }}>
             <TextField
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': {
-                    borderColor: '#0C7E87',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: 'black',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#0fa4af',
-                  }
-                },
-                '& .MuiInputLabel-root.Mui-focused': {
-                  color: 'black',
-                }
-              }}
               label="Email"
               variant="outlined"
               margin="normal"
               fullWidth
-              autoComplete="off"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <TextField
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': {
@@ -109,19 +100,38 @@ export default function Home() {
                   color: 'black',
                 }
               }}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <TextField
               label="Password"
               variant="outlined"
               margin="normal"
               type="password"
               fullWidth
-              autoComplete="off"
               value={password}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: '#0C7E87',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: 'black',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#0fa4af',
+                  }
+                },
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: 'black',
+                }
+              }}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-              <Typography variant="h7" color='#F35773'>
-                {error}
-              </Typography>
+            <Typography variant="h7" color='#F35773'>
+              {error}
+            </Typography>
             <Box marginTop={2}>
               <Button 
                 type="submit" 
@@ -131,31 +141,14 @@ export default function Home() {
                   '&:hover': {
                     backgroundColor: '#0C7E87'
                   }
-                }} 
-                fullWidth
-              >
-                Sign In
-              </Button>
-            </Box>
-          </form>
-            <Box marginTop={2} width='100%' display='flex' flexDirection='row' alignItems='center' justifyContent='center' gap={3}>
-              <Typography variant='h5' color='white'>
-                Don't have an account?
-              </Typography>
-              <Button 
-                variant="contained" 
-                sx={{
-                  backgroundColor: '#0fa4af',
-                  '&:hover': {
-                    backgroundColor: '#0C7E87'
-                  }
-                }}                
-                onClick={() => router.push('/sign-up')}>
+                }}
+                fullWidth>
                 Sign Up
               </Button>
             </Box>
+          </form>
         </Box>
       </Box>
     </>
-  )
+  );
 }
