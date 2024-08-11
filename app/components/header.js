@@ -25,7 +25,7 @@ const Header = (props) => {
             alignItems="center" 
             flexGrow={1}
           >
-            <Image src={logo} alt="AI Chat Support Logo" width={220} height={60} onClick={() => router.push('/')}/>
+            <Image src={logo} alt="AI Chat Support Logo" width={220} height={60}/>
           </Box>
           <Box 
             display="flex" 

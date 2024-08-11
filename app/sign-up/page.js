@@ -85,19 +85,23 @@ export default function Signup() {
               fullWidth
               value={email}
               sx={{
+                input: {
+                  color: 'white',
+                  backgroundColor: '#024950'
+                },
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': {
                     borderColor: '#0C7E87',
                   },
                   '&:hover fieldset': {
-                    borderColor: 'black',
+                    borderColor: 'white',
                   },
                   '&.Mui-focused fieldset': {
                     borderColor: '#0fa4af',
                   }
                 },
                 '& .MuiInputLabel-root.Mui-focused': {
-                  color: 'black',
+                  color: 'white',
                 }
               }}
               onChange={(e) => setEmail(e.target.value)}
@@ -111,19 +115,23 @@ export default function Signup() {
               fullWidth
               value={password}
               sx={{
+                input: {
+                  color: 'white',
+                  backgroundColor: '#024950'
+                },
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': {
                     borderColor: '#0C7E87',
                   },
                   '&:hover fieldset': {
-                    borderColor: 'black',
+                    borderColor: 'white',
                   },
                   '&.Mui-focused fieldset': {
                     borderColor: '#0fa4af',
                   }
                 },
                 '& .MuiInputLabel-root.Mui-focused': {
-                  color: 'black',
+                  color: 'white',
                 }
               }}
               onChange={(e) => setPassword(e.target.value)}

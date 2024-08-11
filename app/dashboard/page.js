@@ -1,12 +1,27 @@
 "use client"
 import { useState, useRef, useEffect } from "react"
 import { Box, Button, Stack, TextField } from "@mui/material"
+import { useAuthState } from "react-firebase-hooks/auth"
+import { auth } from "../firebase"
+import { signOut } from "firebase/auth"
 import ReactMarkdown from 'react-markdown'
 import SendIcon from '@mui/icons-material/Send'
 import { Logout } from "@mui/icons-material"
 import Header from "../components/header"
+import { useRouter } from "next/navigation"
 
 export default function Dashboard() {
+  // User
+  const [user] = useAuthState(auth)
+  const router = useRouter()
+
+  if (typeof window !== 'undefined') {
+    const userSession = sessionStorage.getItem('user')
+    if(!user && !userSession) {
+      router.push('/')
+    }
+  }
+
   // Messages
   const [messages, setMessages] = useState([
     {role: 'assistant', content: `Hi! I'm the Headstarter support assistant. How can I help you today?`}
@@ -81,6 +96,9 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
+    if(!user) {
+      router.push('/')
+    }
     scrollToBottom()
   }, [messages])
 
@@ -97,8 +115,8 @@ export default function Dashboard() {
           variant="contained" 
           onClick={
           () => {
-            // FUNCTIONALITY STILL REQUIRED
-            console.log('Logging out')
+            signOut(auth)
+            sessionStorage.removeItem('user')
         }} startIcon={<Logout />}>Logout</Button>
       }/>
       <Box
@@ -113,11 +131,12 @@ export default function Dashboard() {
         <Stack 
           direction='column' 
           width="90vw" 
-          height="85vh" 
+          height="90vh" 
           border='1px solid black' 
           borderRadius='16px'
           p={2}
           spacing={2}
+          overflow='auto'
         >
           <Stack 
             direction='column' 
@@ -154,6 +173,10 @@ export default function Dashboard() {
           <Stack direction='row' spacing={2}>
             <TextField 
               sx={{
+                input: {
+                  color: 'white',
+                  backgroundColor: '#024950'
+                },
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': {
                     borderColor: '#0C7E87',
@@ -166,7 +189,7 @@ export default function Dashboard() {
                   }
                 },
                 '& .MuiInputLabel-root.Mui-focused': {
-                  color: 'black',
+                  color: 'white',
                 }
               }}
               label="Message" 

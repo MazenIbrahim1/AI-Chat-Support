@@ -68,6 +68,10 @@ export default function Home() {
           <form onSubmit={handleSubmit} style={{ width: '100%' }}>
             <TextField
               sx={{
+                input: {
+                  color: 'white',
+                  backgroundColor: '#024950'
+                },
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': {
                     borderColor: '#0C7E87',
@@ -80,7 +84,7 @@ export default function Home() {
                   }
                 },
                 '& .MuiInputLabel-root.Mui-focused': {
-                  color: 'black',
+                  color: 'white',
                 }
               }}
               label="Email"
@@ -94,6 +98,10 @@ export default function Home() {
             />
             <TextField
               sx={{
+                input: {
+                  color: 'white',
+                  backgroundColor: '#024950'
+                },
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': {
                     borderColor: '#0C7E87',
@@ -106,7 +114,7 @@ export default function Home() {
                   }
                 },
                 '& .MuiInputLabel-root.Mui-focused': {
-                  color: 'black',
+                  color: 'white',
                 }
               }}
               label="Password"
