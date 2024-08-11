@@ -21,8 +21,8 @@ export default function Home() {
     if (!message.trim() || isLoading) return;
 
     setIsLoading(true)
-    setMessage('')
-    setMessages((messages) => [
+    setMessage('') // Clear the message field
+    setMessages((messages) => [ 
       ...messages,
       { role: 'user', content: message },
       { role: 'assistant', content: '' },
