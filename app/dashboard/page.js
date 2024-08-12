@@ -80,6 +80,9 @@ export default function Dashboard() {
       ])
     }
     setIsLoading(false)
+
+    // Add messages to database
+    
   }
 
   const handleKeyPress = (event) => {
