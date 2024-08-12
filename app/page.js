@@ -1,20 +1,48 @@
 "use client"
 import { useState, useRef, useEffect } from "react"
-import { Box, Button, Stack, TextField } from "@mui/material"
+import { Box, Button, Stack, TextField, Modal } from "@mui/material"
 import ReactMarkdown from 'react-markdown'
 import SendIcon from '@mui/icons-material/Send'
 import { Logout } from "@mui/icons-material"
+import RateReviewIcon from '@mui/icons-material/RateReview';
 import Header from "./components/header"
+import FeedbackModal from "./components/feedbackModal"
 
 export default function Home() {
+  // State for Modal visibility
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // When to show feedback button
+  const [isFeedbackButton, setIsFeedbackButton] = useState(false);
+
   // Messages
   const [messages, setMessages] = useState([
-    {role: 'assistant', content: `Hi! I'm the Headstarter support assistant. How can I help you today?`}
+    { role: 'assistant', content: `Hi! I'm the Headstarter support assistant. How can I help you today?` }
   ])
 
   // Textfield message
   const [message, setMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+
+  var enoughMessages = 3;
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleSubmitFeedback = (feedbackData) => {
+    console.log('Feedback Data:', feedbackData);
+    // gotta add feedback to firebase
+    handleCloseModal();
+  };
+
+  const handleOpenFeedbackButton = () => {
+    setIsFeedbackButton(true);
+  };
 
   const sendMessage = async () => {
     // Dont send empty messages
@@ -64,6 +92,14 @@ export default function Home() {
         { role: 'assistant', content: "I'm sorry, but I encountered an error. Please try again later." },
       ])
     }
+    if (messages.length === enoughMessages) { // check here as it's pre-update count
+      setMessages(messages => [
+        ...messages,
+        { role: 'assistant', content: 'We have been talking for a while. Please feel free to leave a feedback using the button under the logout button.' }
+      ]);
+      handleOpenFeedbackButton();
+      handleOpenModal();
+    }
     setIsLoading(false)
   }
 
@@ -87,20 +123,20 @@ export default function Home() {
   return (
     <>
       <Header Button={
-        <Button 
+        <Button
           sx={{
             backgroundColor: '#0fa4af',
             '&:hover': {
               backgroundColor: '#0C7E87'
             }
           }}
-          variant="contained" 
+          variant="contained"
           onClick={
-          () => {
-            // FUNCTIONALITY STILL REQUIRED
-            console.log('Logging out')
-        }} startIcon={<Logout />}>Logout</Button>
-      }/>
+            () => {
+              // FUNCTIONALITY STILL REQUIRED
+              console.log('Logging out')
+            }} startIcon={<Logout />}>Logout</Button>
+      } />
       <Box
         width='100vw'
         height='100vh'
@@ -110,18 +146,35 @@ export default function Home() {
         alignItems='center'
         bgcolor='#024950'
       >
-        <Stack 
-          direction='column' 
-          width="90vw" 
-          height="85vh" 
-          border='1px solid black' 
+        {isFeedbackButton && (<Box width="90vw" display={"flex"} justifyContent={"flex-end"}>
+          <Button
+            variant="contained"
+            onClick={handleOpenModal}
+            disabled={isLoading}
+            startIcon={<RateReviewIcon />}
+            sx={{
+              backgroundColor: '#0fa4af',
+              '&:hover': {
+                backgroundColor: '#0C7E87'
+              },
+              mb: 2
+            }}
+          >
+            Leave Feedback
+          </Button>
+        </Box>)}
+        <Stack
+          direction='column'
+          width="90vw"
+          height="85vh"
+          border='1px solid black'
           borderRadius='16px'
           p={2}
           spacing={2}
         >
-          <Stack 
-            direction='column' 
-            spacing={2} 
+          <Stack
+            direction='column'
+            spacing={2}
             flexGrow={1}
             maxHeight='100%'
             overflow='auto'
@@ -140,7 +193,7 @@ export default function Home() {
                     p={3}
                     lineHeight={2}
                   >
-                    {msg.role === 'assistant' ? 
+                    {msg.role === 'assistant' ?
                       <ReactMarkdown>{msg.content}</ReactMarkdown>
                       :
                       msg.content
@@ -152,7 +205,7 @@ export default function Home() {
             <div ref={messagesEndRef} />
           </Stack>
           <Stack direction='row' spacing={2}>
-            <TextField 
+            <TextField
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': {
@@ -172,7 +225,7 @@ export default function Home() {
               style={{
 
               }}
-              label="Message" 
+              label="Message"
               fullWidth
               value={message}
               onChange={(e) => setMessage(e.target.value)}
@@ -180,7 +233,7 @@ export default function Home() {
               disabled={isLoading}
               autoComplete="off"
             />
-            <Button 
+            <Button
               variant="contained"
               onClick={sendMessage}
               disabled={isLoading}
@@ -192,11 +245,18 @@ export default function Home() {
                 }
               }}
             >
-              {isLoading? 'Sending...' : 'Send'}
+              {isLoading ? 'Sending...' : 'Send'}
             </Button>
           </Stack>
         </Stack>
       </Box>
+      {isModalOpen && !isLoading && (
+        <FeedbackModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onSubmit={handleSubmitFeedback}
+        />
+      )}
     </>
   )
 }
