@@ -7,6 +7,9 @@ import { Logout } from "@mui/icons-material"
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import Header from "./components/header"
 import FeedbackModal from "./components/feedbackModal"
+import { firestore } from '@/firebase';
+import { collection, addDoc } from 'firebase/firestore';
+
 
 export default function Home() {
   // State for Modal visibility
@@ -34,11 +37,21 @@ export default function Home() {
     setIsModalOpen(true);
   };
 
-  const handleSubmitFeedback = (feedbackData) => {
+  const handleSubmitFeedback = async (feedbackData) => {
     console.log('Feedback Data:', feedbackData);
-    // gotta add feedback to firebase
-    handleCloseModal();
+    try {
+      const docRef = await addDoc(collection(firestore, "User Feedback"), {
+        rating: feedbackData.rating,
+        additional_feedback: feedbackData.feedback,
+        timestamp: new Date()
+      });
+      console.log("Document written with ID: ", docRef.id);
+      handleCloseModal();
+    } catch (e) {
+      console.error("Error adding document: ", e); // Error handling
+    }
   };
+
 
   const handleOpenFeedbackButton = () => {
     setIsFeedbackButton(true);
